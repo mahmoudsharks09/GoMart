@@ -81,41 +81,6 @@ function HomePage({
           </Row>
         )}
 
-        <div className="mt-5">
-          <SectionHeader
-            eyebrow="Shop by style"
-            title="Curated product stories"
-            subtitle="Browse matching trends and collections that feel right for your lifestyle."
-          />
-
-          {groupedCollections.map((group) => (
-            <div key={group.category} className="collection-block mb-4">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <h3 className="collection-title">{group.category}</h3>
-                <Button
-                  as={Link}
-                  to="/products"
-                  variant="link"
-                  className="text-dark p-0 text-decoration-none"
-                  onClick={() => setSelectedCategory(group.category)}
-                >
-                  View collection
-                </Button>
-              </div>
-              <Row className="g-4">
-                {group.items.map((product) => (
-                  <Col key={product.id} xs={12} sm={6} lg={4}>
-                    <ProductCard
-                      product={product}
-                      onView={(selected) => (window.location.hash = `#/products/${selected.id}`)}
-                      onAddToCart={addToCart}
-                    />
-                  </Col>
-                ))}
-              </Row>
-            </div>
-          ))}
-        </div>
       </Container>
     </>
   );
