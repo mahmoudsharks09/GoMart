@@ -118,7 +118,14 @@ function StorefrontApp() {
   const [cart, setCart] = useState(initialCart);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState(() => {
+    const savedTheme = localStorage.getItem('gomart-theme');
+    if (savedTheme === 'light' || savedTheme === 'dark') {
+      return savedTheme;
+    }
+
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  });
   const [authToken, setAuthToken] = useState(() => localStorage.getItem(AUTH_STORAGE_KEY) || '');
   const [currentUser, setCurrentUser] = useState(() => {
     const savedUser = localStorage.getItem(USER_STORAGE_KEY);
@@ -142,6 +149,24 @@ function StorefrontApp() {
       localStorage.removeItem(USER_STORAGE_KEY);
     }
   }, [currentUser]);
+
+  useEffect(() => {
+    localStorage.setItem('gomart-theme', theme);
+  }, [theme]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemThemeChange = (event) => {
+      const savedTheme = localStorage.getItem('gomart-theme');
+      if (!savedTheme) {
+        setTheme(event.matches ? 'dark' : 'light');
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
+
+    return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
+  }, []);
 
   const loadProducts = async () => {
     try {
