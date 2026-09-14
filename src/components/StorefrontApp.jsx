@@ -7,6 +7,7 @@ import AuthPage from './AuthPage';
 import HomePage from './HomePage';
 import ProductsPage from './ProductsPage';
 import CartPage from './CartPage';
+import CheckoutPage from './CheckoutPage';
 import DashboardPage from './DashboardPage';
 import { adminCredentials, moderatorCredentials, testerCredentials } from '../data/authUsers';
 
@@ -245,6 +246,10 @@ function StorefrontApp() {
 
   const removeFromCart = (productId) => {
     setCart((prevCart) => prevCart.filter((item) => item.id !== productId));
+  };
+
+  const handlePlaceOrder = () => {
+    setCart([]);
   };
 
   const handleSearch = (value) => {
@@ -551,6 +556,16 @@ function StorefrontApp() {
               updateCartQuantity={updateCartQuantity}
               removeFromCart={removeFromCart}
               totalCartValue={totalCartValue}
+            />
+          } />
+
+          <Route path="/checkout" element={
+            <CheckoutPage
+              cart={cart}
+              products={products}
+              totalCartValue={totalCartValue}
+              onPlaceOrder={handlePlaceOrder}
+              currentUser={currentUser}
             />
           } />
 

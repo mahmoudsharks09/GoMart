@@ -62,18 +62,20 @@ function CartPage({ cart, products, updateCartQuantity, removeFromCart, totalCar
             </div>
             <div className="d-flex justify-content-between text-muted mb-2">
               <span>Shipping</span>
-              <span>$25.00</span>
+              <span>$15.00</span>
             </div>
             <div className="d-flex justify-content-between text-muted mb-2">
               <span>Tax</span>
-              <span>$12.00</span>
+              <span>${(totalCartValue * 0.08).toFixed(2)}</span>
             </div>
             <hr />
             <div className="d-flex justify-content-between fw-bold mb-3">
               <span>Total</span>
-              <span>${(totalCartValue + 37).toFixed(2)}</span>
+              <span>${(totalCartValue + 15 + totalCartValue * 0.08).toFixed(2)}</span>
             </div>
-            <Button variant="dark" className="w-100 rounded-pill py-2">Proceed to Checkout</Button>
+            <Button href="#/checkout" variant="dark" className="w-100 rounded-pill py-2">
+              Proceed to Checkout
+            </Button>
           </Card>
         </Col>
       </Row>

@@ -1,6 +1,11 @@
 .app-shell {
   min-height: 100vh;
-  background: linear-gradient(180deg, #f9f5f0 0%, #fff 22%, #f9f5f0 100%);
+  background: linear-gradient(180deg, #fffaf5 0%, #fff 18%, #fffaf5 100%);
+}
+
+body {
+  background: #fffaf5;
+  color: #171717;
 }
 
 .topbar-shell {
@@ -205,7 +210,10 @@
 .cart-item,
 .summary-card,
 .auth-card,
-.product-card {
+.product-card,
+.checkout-card,
+.success-card,
+.confirm-modal-card {
   border-radius: 1.5rem !important;
 }
 
@@ -218,6 +226,66 @@
 
 .summary-card {
   background: #fff;
+  border: 1px solid rgba(23, 23, 23, 0.06);
+}
+
+.checkout-card,
+.success-card {
+  background: #fff;
+  border: 1px solid rgba(23, 23, 23, 0.06);
+}
+
+.checkout-item + .checkout-item {
+  border-top: 1px solid rgba(23, 23, 23, 0.08);
+}
+
+.checkout-thumb {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 0.9rem;
+}
+
+.success-icon {
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e8f9ef;
+  color: #1d8f57;
+  font-size: 2rem;
+}
+
+.confirm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 17, 17, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+  padding: 1rem;
+}
+
+.confirm-modal-card {
+  width: min(100%, 420px);
+  border: 1px solid rgba(23, 23, 23, 0.08);
+}
+
+.confirm-modal-icon {
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff3db;
+  color: #c77a00;
+  font-size: 1.8rem;
 }
 
 .auth-card {

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button, Card, Col, Container, Form, Row, Table } from 'react-bootstrap';
 import { authUsers } from '../data/authUsers';
 
@@ -9,6 +9,17 @@ const defaultProductForm = {
   description: '',
   brand: '',
   stock: '',
+};
+
+const defaultUserForm = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  role: 'Customer',
+  phone: '',
+  gender: 'N/A',
+  company: 'GoMart',
+  image: '',
 };
 
 const productImageMap = {
@@ -64,6 +75,11 @@ function DashboardPage({
   const [userRoleFilter, setUserRoleFilter] = useState('All');
   const [userPage, setUserPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [userForm, setUserForm] = useState(defaultUserForm);
+  const [editingUserId, setEditingUserId] = useState(null);
+  const [confirmState, setConfirmState] = useState(null);
+
   const dashboardUsers = useMemo(() => {
     return authUsers.map((user) => ({
       id: `saved-${user.email}`,
@@ -71,6 +87,10 @@ function DashboardPage({
       lastName: user.name?.split(' ').slice(1).join(' ') || '',
       email: user.email,
       role: user.role || 'User',
+      phone: 'N/A',
+      company: 'GoMart',
+      gender: 'N/A',
+      image: user.image || '',
     }));
   }, []);
 
@@ -87,13 +107,34 @@ function DashboardPage({
         phone: user.phone || 'N/A',
         company: user.company?.name || 'GoMart',
         gender: user.gender || 'N/A',
+        image: user.image || savedUser?.image || '',
       };
     });
   }, [users]);
 
+  const mergedUsers = useMemo(() => {
+    const map = new Map();
+    [...dashboardUsers, ...apiUsers].forEach((user) => {
+      map.set(String(user.id || user.email), user);
+    });
+    return [...map.values()];
+  }, [apiUsers, dashboardUsers]);
+
+  const [userList, setUserList] = useState(mergedUsers);
+
+  useEffect(() => {
+    setUserList(mergedUsers);
+  }, [mergedUsers]);
+
+  useEffect(() => {
+    if (products.length > 0 && (!selectedProduct || !products.some((item) => item.id === selectedProduct.id))) {
+      setSelectedProduct(products[0]);
+    }
+  }, [products, selectedProduct]);
+
   const filteredUsers = useMemo(() => {
     const query = userSearch.trim().toLowerCase();
-    return apiUsers.filter((user) => {
+    return userList.filter((user) => {
       const matchesSearch =
         !query ||
         user.firstName.toLowerCase().includes(query) ||
@@ -104,14 +145,24 @@ function DashboardPage({
       const matchesRole = userRoleFilter === 'All' || user.role === userRoleFilter;
       return matchesSearch && matchesRole;
     });
-  }, [apiUsers, userRoleFilter, userSearch]);
+  }, [userList, userRoleFilter, userSearch]);
 
-  const userRoleOptions = ['All', ...new Set(apiUsers.map((user) => user.role))];
+  const userRoleOptions = ['All', ...new Set(userList.map((user) => user.role))];
   const userTotalPages = Math.max(1, Math.ceil(filteredUsers.length / 5));
   const paginatedUsers = filteredUsers.slice((userPage - 1) * 5, userPage * 5);
 
   const handleUserPageChange = (nextPage) => {
     setUserPage(Math.min(Math.max(nextPage, 1), userTotalPages));
+  };
+
+  const canManageUserImages = currentUser && (currentUser.role === 'Admin' || currentUser.role === 'Moderator');
+
+  const triggerAlert = (message) => {
+    setAlertMessage(message);
+  };
+
+  const openConfirmDialog = (message, onConfirm) => {
+    setConfirmState({ message, onConfirm });
   };
 
   const summary = useMemo(() => {
@@ -128,32 +179,125 @@ function DashboardPage({
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleUserFormChange = (event) => {
+    const { name, value } = event.target;
+    setUserForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const resetUserForm = () => {
+    setUserForm(defaultUserForm);
+    setEditingUserId(null);
+  };
+
+  const handleUserSubmit = (event) => {
+    event.preventDefault();
+
+    const nextName = `${userForm.firstName || 'User'} ${userForm.lastName || ''}`.trim();
+    const email = userForm.email.trim();
+
+    if (!email) {
+      triggerAlert('Please enter a valid email address for the user.');
+      return;
+    }
+
+    const normalizedUser = {
+      id: editingUserId || `new-${Date.now()}`,
+      firstName: userForm.firstName.trim() || 'User',
+      lastName: userForm.lastName.trim(),
+      email,
+      role: userForm.role || 'Customer',
+      phone: userForm.phone.trim() || 'N/A',
+      company: userForm.company.trim() || 'GoMart',
+      gender: userForm.gender || 'N/A',
+      image: userForm.image?.trim() || '',
+    };
+
+    const doSubmit = () => {
+      if (editingUserId) {
+        setUserList((prev) => prev.map((user) => (String(user.id) === String(editingUserId) ? { ...user, ...normalizedUser } : user)));
+        triggerAlert(`User ${nextName} updated successfully.`);
+      } else {
+        setUserList((prev) => [normalizedUser, ...prev]);
+        triggerAlert(`User ${nextName} created successfully.`);
+      }
+
+      resetUserForm();
+      setSelectedUser(normalizedUser);
+      setUserPage(1);
+      setConfirmState(null);
+    };
+
+    const confirmMessage = editingUserId
+      ? `Are you sure you want to save changes for ${nextName}?`
+      : `Are you sure you want to add ${nextName}?`;
+
+    openConfirmDialog(confirmMessage, doSubmit);
+  };
+
+  const handleEditUser = (user) => {
+    setEditingUserId(user.id);
+    setUserForm({
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
+      email: user.email || '',
+      role: user.role || 'Customer',
+      phone: user.phone || '',
+      gender: user.gender || 'N/A',
+      company: user.company || 'GoMart',
+      image: user.image || '',
+    });
+    setSelectedUser(user);
+  };
+
+  const handleDeleteUser = (userId) => {
+    const user = userList.find((item) => String(item.id) === String(userId));
+    const name = user ? `${user.firstName} ${user.lastName}`.trim() : 'this user';
+
+    openConfirmDialog(`Are you sure you want to delete ${name}?`, () => {
+      setUserList((prev) => prev.filter((item) => String(item.id) !== String(userId)));
+      setSelectedUser((prev) => (prev && String(prev.id) === String(userId) ? null : prev));
+      triggerAlert('User deleted successfully.');
+      setConfirmState(null);
+    });
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    const productImage = getProductImage(form.category, form.description);
+    const productName = form.title.trim() || 'this product';
+    const confirmMessage = editingId
+      ? `Are you sure you want to save changes for ${productName}?`
+      : `Are you sure you want to add ${productName}?`;
 
-    const payload = {
-      title: form.title.trim(),
-      category: form.category,
-      price: Number(form.price || 0),
-      description: form.description.trim() || 'New product',
-      brand: form.brand.trim() || 'JJ Buys',
-      stock: Number(form.stock || 0),
-      thumbnail: productImage,
-      images: [productImage, productImage],
+    const doSubmit = () => {
+      const productImage = getProductImage(form.category, form.description);
+
+      const payload = {
+        title: form.title.trim(),
+        category: form.category,
+        price: Number(form.price || 0),
+        description: form.description.trim() || 'New product',
+        brand: form.brand.trim() || 'JJ Buys',
+        stock: Number(form.stock || 0),
+        thumbnail: productImage,
+        images: [productImage, productImage],
+      };
+
+      if (editingId) {
+        onUpdateProduct(editingId, payload);
+        setAlertMessage('Product updated successfully.');
+      } else {
+        onAddProduct(payload);
+        setAlertMessage('Product added successfully.');
+      }
+
+      setForm(defaultProductForm);
+      setEditingId(null);
+      setSelectedProduct({ ...payload, id: editingId || Date.now(), name: payload.title });
+      setConfirmState(null);
     };
 
-    if (editingId) {
-      onUpdateProduct(editingId, payload);
-      setAlertMessage('Product updated successfully.');
-    } else {
-      onAddProduct(payload);
-      setAlertMessage('Product added successfully.');
-    }
-
-    setForm(defaultProductForm);
-    setEditingId(null);
+    openConfirmDialog(confirmMessage, doSubmit);
   };
 
   const handleEdit = (product) => {
@@ -169,13 +313,47 @@ function DashboardPage({
   };
 
   const handleDelete = (productId) => {
-    onDeleteProduct(productId);
-    setAlertMessage('Product deleted successfully.');
+    const product = products.find((item) => item.id === productId);
+    if (!product) {
+      return;
+    }
+
+    openConfirmDialog(`Are you sure you want to delete ${product.name}?`, () => {
+      onDeleteProduct(productId);
+      setAlertMessage('Product deleted successfully.');
+      if (selectedProduct && selectedProduct.id === productId) {
+        setSelectedProduct(null);
+      }
+      setConfirmState(null);
+    });
   };
 
   return (
-    <Container className="py-5">
-      <div className="d-flex justify-content-between align-items-end gap-3 flex-wrap mb-4">
+    <>
+      {confirmState ? (
+        <div className="confirm-modal-backdrop">
+          <Card className="confirm-modal-card border-0 shadow-sm">
+            <Card.Body>
+              <div className="confirm-modal-icon mb-3">
+                <i className="bi bi-exclamation-triangle-fill" />
+              </div>
+              <h4 className="mb-3 text-center">Confirm action</h4>
+              <p className="text-center text-muted mb-4">{confirmState.message}</p>
+              <div className="d-flex justify-content-center gap-2">
+                <Button variant="dark" className="rounded-pill px-4" onClick={confirmState.onConfirm}>
+                  Yes, continue
+                </Button>
+                <Button variant="outline-dark" className="rounded-pill px-4" onClick={() => setConfirmState(null)}>
+                  Cancel
+                </Button>
+              </div>
+            </Card.Body>
+          </Card>
+        </div>
+      ) : null}
+
+      <Container className="py-5">
+        <div className="d-flex justify-content-between align-items-end gap-3 flex-wrap mb-4">
         <div>
           <p className="eyebrow mb-2">Dashboard</p>
           <h2 className="section-title mb-0">Admin overview</h2>
@@ -313,44 +491,81 @@ function DashboardPage({
           </Col>
 
           <Col lg={7}>
-            <Card className="border-0 shadow-sm p-3">
-              <h4 className="mb-3">Products</h4>
-              <div style={{ maxHeight: '420px', overflowY: 'auto' }} className="table-responsive">
-                <Table hover className="align-middle mb-0">
-                  <thead className="table-light" style={{ position: 'sticky', top: 0, zIndex: 1 }}>
-                    <tr>
-                      <th>Product</th>
-                      <th>Category</th>
-                      <th>Price</th>
-                      <th>Stock</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {products.map((product) => (
-                      <tr key={product.id}>
-                        <td>
-                          <div className="fw-semibold">{product.name}</div>
-                        </td>
-                        <td>{product.category}</td>
-                        <td>${Number(product.price).toFixed(2)}</td>
-                        <td>{product.stock}</td>
-                        <td>
-                          <div className="d-flex gap-2">
-                            <Button size="sm" variant="outline-dark" onClick={() => handleEdit(product)}>
-                              Edit
-                            </Button>
-                            <Button size="sm" variant="outline-danger" onClick={() => handleDelete(product.id)}>
-                              Delete
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              </div>
-            </Card>
+            <Row className="g-4">
+              <Col xs={12}>
+                <Card className="border-0 shadow-sm p-3">
+                  <h4 className="mb-3">Products</h4>
+                  <div style={{ maxHeight: '420px', overflowY: 'auto' }} className="table-responsive">
+                    <Table hover className="align-middle mb-0">
+                      <thead className="table-light" style={{ position: 'sticky', top: 0, zIndex: 1 }}>
+                        <tr>
+                          <th>Product</th>
+                          <th>Category</th>
+                          <th>Price</th>
+                          <th>Stock</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {products.map((product) => (
+                          <tr
+                            key={product.id}
+                            onClick={() => setSelectedProduct(product)}
+                            style={{ cursor: 'pointer' }}
+                            className={selectedProduct?.id === product.id ? 'table-active' : ''}
+                          >
+                            <td>
+                              <div className="fw-semibold">{product.name}</div>
+                            </td>
+                            <td>{product.category}</td>
+                            <td>${Number(product.price).toFixed(2)}</td>
+                            <td>{product.stock}</td>
+                            <td onClick={(event) => event.stopPropagation()}>
+                              <div className="d-flex gap-2">
+                                <Button size="sm" variant="outline-dark" onClick={() => handleEdit(product)}>
+                                  Edit
+                                </Button>
+                                <Button size="sm" variant="outline-danger" onClick={() => handleDelete(product.id)}>
+                                  Delete
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  </div>
+                </Card>
+              </Col>
+
+              <Col xs={12}>
+                <Card className="border-0 shadow-sm p-3">
+                  <h5 className="mb-3">Selected product details</h5>
+                  {selectedProduct ? (
+                    <div className="d-flex flex-column gap-2">
+                      <div className="d-flex align-items-center gap-3">
+                        <img
+                          src={selectedProduct.image || selectedProduct.thumbnail || selectedProduct.gallery?.[0]}
+                          alt={selectedProduct.name}
+                          style={{ width: 90, height: 90, objectFit: 'cover', borderRadius: 12 }}
+                        />
+                        <div>
+                          <div className="fw-bold fs-5">{selectedProduct.name}</div>
+                          <div className="text-muted small">{selectedProduct.category}</div>
+                        </div>
+                      </div>
+                      <div><strong>Price:</strong> ${Number(selectedProduct.price).toFixed(2)}</div>
+                      <div><strong>Original price:</strong> ${Number(selectedProduct.originalPrice || selectedProduct.price).toFixed(2)}</div>
+                      <div><strong>Stock:</strong> {selectedProduct.stock}</div>
+                      <div><strong>Brand:</strong> {selectedProduct.brand || 'JJ Buys'}</div>
+                      <div><strong>Description:</strong> {selectedProduct.description}</div>
+                    </div>
+                  ) : (
+                    <div className="text-muted">Select a product to view details.</div>
+                  )}
+                </Card>
+              </Col>
+            </Row>
           </Col>
         </Row>
       ) : null}
@@ -381,7 +596,91 @@ function DashboardPage({
 
       {activeTab === 'users' ? (
         <Row className="g-4 mt-1">
-          <Col lg={12}>
+          <Col lg={4}>
+            <Card className="border-0 shadow-sm p-3 h-100">
+              <h4 className="mb-3">{editingUserId ? 'Edit user' : 'Add user'}</h4>
+              <Form onSubmit={handleUserSubmit}>
+                {canManageUserImages ? (
+                  <Form.Group className="mb-3">
+                    <Form.Label>User image URL</Form.Label>
+                    <Form.Control
+                      type="url"
+                      name="image"
+                      value={userForm.image}
+                      onChange={handleUserFormChange}
+                      placeholder="https://example.com/image.jpg"
+                    />
+                  </Form.Group>
+                ) : null}
+                <Row className="g-3">
+                  <Col md={6}>
+                    <Form.Group>
+                      <Form.Label>First name</Form.Label>
+                      <Form.Control name="firstName" value={userForm.firstName} onChange={handleUserFormChange} required />
+                    </Form.Group>
+                  </Col>
+                  <Col md={6}>
+                    <Form.Group>
+                      <Form.Label>Last name</Form.Label>
+                      <Form.Control name="lastName" value={userForm.lastName} onChange={handleUserFormChange} />
+                    </Form.Group>
+                  </Col>
+                  <Col xs={12}>
+                    <Form.Group>
+                      <Form.Label>Email</Form.Label>
+                      <Form.Control type="email" name="email" value={userForm.email} onChange={handleUserFormChange} required />
+                    </Form.Group>
+                  </Col>
+                  <Col md={6}>
+                    <Form.Group>
+                      <Form.Label>Role</Form.Label>
+                      <Form.Select name="role" value={userForm.role} onChange={handleUserFormChange}>
+                        <option value="Customer">Customer</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Moderator">Moderator</option>
+                        <option value="Tester">Tester</option>
+                      </Form.Select>
+                    </Form.Group>
+                  </Col>
+                  <Col md={6}>
+                    <Form.Group>
+                      <Form.Label>Phone</Form.Label>
+                      <Form.Control name="phone" value={userForm.phone} onChange={handleUserFormChange} />
+                    </Form.Group>
+                  </Col>
+                  <Col md={6}>
+                    <Form.Group>
+                      <Form.Label>Gender</Form.Label>
+                      <Form.Select name="gender" value={userForm.gender} onChange={handleUserFormChange}>
+                        <option value="N/A">N/A</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                      </Form.Select>
+                    </Form.Group>
+                  </Col>
+                  <Col md={6}>
+                    <Form.Group>
+                      <Form.Label>Company</Form.Label>
+                      <Form.Control name="company" value={userForm.company} onChange={handleUserFormChange} />
+                    </Form.Group>
+                  </Col>
+                </Row>
+
+                <div className="d-flex gap-2 mt-4 flex-wrap">
+                  <Button type="submit" variant="dark" className="rounded-pill px-4">
+                    {editingUserId ? 'Save changes' : 'Create user'}
+                  </Button>
+                  {editingUserId ? (
+                    <Button type="button" variant="outline-dark" className="rounded-pill px-4" onClick={resetUserForm}>
+                      Cancel
+                    </Button>
+                  ) : null}
+                </div>
+              </Form>
+            </Card>
+          </Col>
+
+          <Col lg={8}>
             <Card className="border-0 shadow-sm p-3 h-100">
               <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                 <h4 className="mb-0">Users Module</h4>
@@ -418,23 +717,49 @@ function DashboardPage({
                   <div className="d-grid gap-3">
                     {paginatedUsers.length > 0 ? (
                       paginatedUsers.map((user) => (
-                        <button
+                        <div
                           key={user.id}
-                          type="button"
-                          className="text-start border rounded-4 p-3 bg-white w-100"
-                          onClick={() => setSelectedUser(user)}
+                          className="border rounded-4 p-3 bg-white w-100"
                           style={{ borderColor: selectedUser?.id === user.id ? '#0d6efd' : '#dee2e6' }}
                         >
                           <div className="d-flex justify-content-between align-items-center gap-3">
-                            <div>
-                              <div className="fw-semibold">
-                                {user.firstName} {user.lastName}
-                              </div>
-                              <small className="text-muted">{user.email}</small>
+                            <div className="d-flex align-items-center gap-3 flex-grow-1">
+                              {user.image ? (
+                                <img
+                                  src={user.image}
+                                  alt={`${user.firstName} ${user.lastName}`}
+                                  style={{ width: 48, height: 48, borderRadius: 14, objectFit: 'cover' }}
+                                />
+                              ) : (
+                                <div
+                                  className="d-flex align-items-center justify-content-center text-white fw-bold"
+                                  style={{ width: 48, height: 48, borderRadius: 14, background: '#0d6efd' }}
+                                >
+                                  {(user.firstName || 'U').charAt(0).toUpperCase()}
+                                </div>
+                              )}
+                              <button
+                                type="button"
+                                className="text-start bg-transparent border-0 p-0 flex-grow-1"
+                                onClick={() => setSelectedUser(user)}
+                              >
+                                <div className="fw-semibold">
+                                  {user.firstName} {user.lastName}
+                                </div>
+                                <small className="text-muted">{user.email}</small>
+                              </button>
                             </div>
                             <span className="badge rounded-pill bg-light text-dark">{user.role}</span>
                           </div>
-                        </button>
+                          <div className="d-flex gap-2 mt-3">
+                            <Button size="sm" variant="outline-dark" onClick={() => handleEditUser(user)}>
+                              Edit
+                            </Button>
+                            <Button size="sm" variant="outline-danger" onClick={() => handleDeleteUser(user.id)}>
+                              Delete
+                            </Button>
+                          </div>
+                        </div>
                       ))
                     ) : (
                       <div className="border rounded-4 p-4 text-muted">No users match your search.</div>
@@ -466,6 +791,15 @@ function DashboardPage({
                   <div className="border rounded-4 p-3 h-100 bg-light-subtle">
                     {selectedUser ? (
                       <>
+                        {selectedUser.image ? (
+                          <div className="mb-3 text-center">
+                            <img
+                              src={selectedUser.image}
+                              alt={`${selectedUser.firstName} ${selectedUser.lastName}`}
+                              style={{ width: '100%', maxWidth: 160, height: 160, borderRadius: 18, objectFit: 'cover' }}
+                            />
+                          </div>
+                        ) : null}
                         <div className="fw-bold fs-5 mb-2">
                           {selectedUser.firstName} {selectedUser.lastName}
                         </div>
@@ -474,6 +808,14 @@ function DashboardPage({
                         <div className="mb-2"><strong>Phone:</strong> {selectedUser.phone}</div>
                         <div className="mb-2"><strong>Gender:</strong> {selectedUser.gender}</div>
                         <div className="mb-2"><strong>Company:</strong> {selectedUser.company}</div>
+                        <div className="d-flex gap-2 mt-3">
+                          <Button size="sm" variant="outline-dark" onClick={() => handleEditUser(selectedUser)}>
+                            Edit user
+                          </Button>
+                          <Button size="sm" variant="outline-danger" onClick={() => handleDeleteUser(selectedUser.id)}>
+                            Delete user
+                          </Button>
+                        </div>
                       </>
                     ) : (
                       <div className="text-muted">Select a user to view the details.</div>
@@ -492,9 +834,25 @@ function DashboardPage({
           <div className="d-grid gap-3">
             {authUsers.map((user) => (
               <div key={user.email} className="border rounded-4 p-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <div>
-                  <div className="fw-semibold">{user.name}</div>
-                  <small className="text-muted">{user.email}</small>
+                <div className="d-flex align-items-center gap-3">
+                  {user.image ? (
+                    <img
+                      src={user.image}
+                      alt={user.name}
+                      style={{ width: 44, height: 44, borderRadius: 12, objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <div
+                      className="d-flex align-items-center justify-content-center text-white fw-bold"
+                      style={{ width: 44, height: 44, borderRadius: 12, background: '#6c757d' }}
+                    >
+                      {(user.name || 'U').charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <div>
+                    <div className="fw-semibold">{user.name}</div>
+                    <small className="text-muted">{user.email}</small>
+                  </div>
                 </div>
                 <div className="d-flex gap-2 flex-wrap align-items-center">
                   <span className="badge rounded-pill bg-light text-dark">{user.role}</span>
@@ -505,7 +863,8 @@ function DashboardPage({
           </div>
         </Card>
       ) : null}
-    </Container>
+      </Container>
+    </>
   );
 }
 
