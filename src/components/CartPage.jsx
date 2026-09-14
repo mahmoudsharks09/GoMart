@@ -2,6 +2,8 @@ import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import SectionHeader from './SectionHeader';
 
 function CartPage({ cart, products, updateCartQuantity, removeFromCart, totalCartValue }) {
+  const isCartEmpty = cart.length === 0;
+
   return (
     <Container className="py-5">
       <SectionHeader eyebrow="Checkout" title="Your shopping cart" />
@@ -73,7 +75,13 @@ function CartPage({ cart, products, updateCartQuantity, removeFromCart, totalCar
               <span>Total</span>
               <span>${(totalCartValue + 15 + totalCartValue * 0.08).toFixed(2)}</span>
             </div>
-            <Button href="#/checkout" variant="dark" className="w-100 rounded-pill py-2">
+            <Button
+              href={isCartEmpty ? undefined : '#/checkout'}
+              variant="dark"
+              className="w-100 rounded-pill py-2"
+              disabled={isCartEmpty}
+              onClick={isCartEmpty ? (event) => event.preventDefault() : undefined}
+            >
               Proceed to Checkout
             </Button>
           </Card>
