@@ -118,6 +118,7 @@ function StorefrontApp() {
   const [cart, setCart] = useState(initialCart);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [theme, setTheme] = useState('light');
   const [authToken, setAuthToken] = useState(() => localStorage.getItem(AUTH_STORAGE_KEY) || '');
   const [currentUser, setCurrentUser] = useState(() => {
     const savedUser = localStorage.getItem(USER_STORAGE_KEY);
@@ -494,7 +495,7 @@ function StorefrontApp() {
 
   return (
     <HashRouter>
-      <div className="app-shell">
+      <div className={`app-shell ${theme}`}>
         <Topbar
           cartCount={cartCount}
           onSearch={handleSearch}
@@ -502,6 +503,8 @@ function StorefrontApp() {
           setSearchQuery={setSearchQuery}
           currentUser={currentUser}
           onLogout={handleLogout}
+          theme={theme}
+          onToggleTheme={() => setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))}
         />
 
         <Routes>

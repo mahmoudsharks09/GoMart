@@ -161,8 +161,8 @@ function DashboardPage({
     setAlertMessage(message);
   };
 
-  const openConfirmDialog = (message, onConfirm) => {
-    setConfirmState({ message, onConfirm });
+  const openConfirmDialog = (message, onConfirm, details = {}) => {
+    setConfirmState({ message, onConfirm, ...details });
   };
 
   const summary = useMemo(() => {
@@ -231,7 +231,16 @@ function DashboardPage({
       ? `Are you sure you want to save changes for ${nextName}?`
       : `Are you sure you want to add ${nextName}?`;
 
-    openConfirmDialog(confirmMessage, doSubmit);
+    openConfirmDialog(confirmMessage, doSubmit, {
+      type: 'user',
+      action: editingUserId ? 'Update user' : 'Add user',
+      title: nextName,
+      details: [
+        { label: 'Email', value: email },
+        { label: 'Role', value: userForm.role || 'Customer' },
+        { label: 'Company', value: userForm.company || 'GoMart' },
+      ],
+    });
   };
 
   const handleEditUser = (user) => {
@@ -258,6 +267,15 @@ function DashboardPage({
       setSelectedUser((prev) => (prev && String(prev.id) === String(userId) ? null : prev));
       triggerAlert('User deleted successfully.');
       setConfirmState(null);
+    }, {
+      type: 'user',
+      action: 'Delete user',
+      title: name,
+      details: [
+        { label: 'Email', value: user?.email || 'N/A' },
+        { label: 'Role', value: user?.role || 'Customer' },
+        { label: 'Company', value: user?.company || 'GoMart' },
+      ],
     });
   };
 
@@ -297,7 +315,16 @@ function DashboardPage({
       setConfirmState(null);
     };
 
-    openConfirmDialog(confirmMessage, doSubmit);
+    openConfirmDialog(confirmMessage, doSubmit, {
+      type: 'product',
+      action: editingId ? 'Update product' : 'Add product',
+      title: productName,
+      details: [
+        { label: 'Category', value: form.category || 'General' },
+        { label: 'Price', value: `$${Number(form.price || 0).toFixed(2)}` },
+        { label: 'Stock', value: String(form.stock || 0) },
+      ],
+    });
   };
 
   const handleEdit = (product) => {
@@ -325,6 +352,15 @@ function DashboardPage({
         setSelectedProduct(null);
       }
       setConfirmState(null);
+    }, {
+      type: 'product',
+      action: 'Delete product',
+      title: product.name,
+      details: [
+        { label: 'Category', value: product.category || 'General' },
+        { label: 'Price', value: `$${Number(product.price || 0).toFixed(2)}` },
+        { label: 'Stock', value: String(product.stock || 0) },
+      ],
     });
   };
 
@@ -337,9 +373,24 @@ function DashboardPage({
               <div className="confirm-modal-icon mb-3">
                 <i className="bi bi-exclamation-triangle-fill" />
               </div>
-              <h4 className="mb-3 text-center">Confirm action</h4>
-              <p className="text-center text-muted mb-4">{confirmState.message}</p>
-              <div className="d-flex justify-content-center gap-2">
+              <div className="text-center small text-uppercase fw-bold mb-2" style={{ letterSpacing: '0.14em', color: '#a96f33' }}>
+                {confirmState.action || 'Confirm action'}
+              </div>
+              <h4 className="confirm-modal-title mb-3 text-center">{confirmState.title || 'Confirm action'}</h4>
+              <p className="text-center text-muted mb-3">{confirmState.message}</p>
+
+              {confirmState.details?.length ? (
+                <div className="confirm-modal-meta mb-4">
+                  {confirmState.details.map((item) => (
+                    <div key={item.label} className="d-flex justify-content-between align-items-center py-1">
+                      <span className="label">{item.label}</span>
+                      <strong className="text-end" style={{ color: '#1a1a1a' }}>{item.value}</strong>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+
+              <div className="d-flex justify-content-center gap-2 flex-wrap">
                 <Button variant="dark" className="rounded-pill px-4" onClick={confirmState.onConfirm}>
                   Yes, continue
                 </Button>

@@ -1,23 +1,50 @@
 .app-shell {
   min-height: 100vh;
-  background: linear-gradient(180deg, #f4f7f5 0%, #ffffff 20%, #f2f6f3 100%);
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.app-shell.dark {
+  background: #111315;
+  color: #f3f3f3;
+}
+
+.app-shell.light {
+  background: linear-gradient(180deg, #eef6ff 0%, #f8fbff 45%, #ffffff 100%);
+  color: #0f172a;
 }
 
 body {
-  background: #f5f7f6;
-  color: #1d2b20;
+  background: #111315;
+  color: #f3f3f3;
 }
 
 .topbar-shell {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: rgba(255, 255, 255, 0.9) !important;
   backdrop-filter: blur(12px);
+}
+
+.app-shell.dark .topbar-shell {
+  background: rgba(20, 22, 25, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.app-shell.light .topbar-shell {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-color: rgba(25, 92, 255, 0.15) !important;
 }
 
 .brand-text {
   letter-spacing: -0.04em;
+}
+
+.app-shell.dark .brand-text {
+  color: #f3f3f3 !important;
+}
+
+.app-shell.light .brand-text {
+  color: #0f172a !important;
 }
 
 .brand-mark {
@@ -27,10 +54,18 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 0.8rem;
-  background: #1e5f3d;
-  color: #fff;
   font-size: 1.05rem;
   font-weight: 700;
+}
+
+.app-shell.dark .brand-mark {
+  background: #f3f3f3;
+  color: #1a1a1a;
+}
+
+.app-shell.light .brand-mark {
+  background: linear-gradient(135deg, #0d5ef7, #4b8dff);
+  color: #fff;
 }
 
 .brand-mark i {
@@ -39,20 +74,64 @@ body {
 
 .nav-links a {
   font-size: 0.95rem;
-  color: #3a3a3a;
   font-weight: 600;
+}
+
+.app-shell.dark .nav-links a {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.app-shell.dark .nav-links a:hover,
+.app-shell.dark .nav-links a:focus {
+  color: #ffffff !important;
+}
+
+.app-shell.light .nav-links a {
+  color: #111111;
+}
+
+.app-shell.light .nav-links a:hover,
+.app-shell.light .nav-links a:focus {
+  color: #000000 !important;
 }
 
 .search-box .form-control {
   border-left: 0;
-  background: #f4f3f1;
-  border-color: #ece8e4;
+  color: #fff;
+}
+
+.app-shell.dark .search-box .form-control {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.app-shell.dark .search-box .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.app-shell.light .search-box .form-control {
+  background: rgba(13, 94, 247, 0.04);
+  border-color: rgba(13, 94, 247, 0.12);
+  color: #0f172a;
+}
+
+.app-shell.light .search-box .form-control::placeholder {
+  color: rgba(15, 23, 42, 0.5);
 }
 
 .user-chip {
   padding: 0.35rem 0.5rem;
   border-radius: 999px;
-  background: #f3f2f1;
+}
+
+.app-shell.dark .user-chip {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+.app-shell.light .user-chip {
+  background: rgba(13, 94, 247, 0.06);
+  color: #0f172a;
 }
 
 .avatar-circle {
@@ -69,11 +148,18 @@ body {
 
 .hero-section {
   padding-top: 2rem;
-  background: linear-gradient(135deg, rgba(226, 241, 230, 0.9), rgba(255, 255, 255, 0.98));
+}
+
+.app-shell.dark .hero-section {
+  background: linear-gradient(180deg, #171a1f 0%, #121417 100%);
+}
+
+.app-shell.light .hero-section {
+  background: linear-gradient(90deg, #dfeeff 0%, #f5f9ff 38%, #ffffff 100%);
 }
 
 .eyebrow {
-  color: #2f6a4f;
+  color: #b57a42;
   text-transform: uppercase;
   letter-spacing: 0.18em;
   font-size: 0.72rem;
@@ -84,13 +170,24 @@ body {
   font-size: clamp(2rem, 3vw, 2.6rem);
   letter-spacing: -0.05em;
   font-weight: 700;
-  color: #1d2b20;
+  color: #1a1a1a;
+}
+
+.app-shell.dark .section-title {
+  color: #f3f5f7;
 }
 
 .hero-title {
   letter-spacing: -0.06em;
   line-height: 1.02;
-  color: #1c2d1f;
+}
+
+.app-shell.dark .hero-title {
+  color: #f5f5f5;
+}
+
+.app-shell.light .hero-title {
+  color: #0f172a;
 }
 
 .hero-metrics {
@@ -104,19 +201,35 @@ body {
   color: #3d4f42;
 }
 
+.app-shell.dark .hero-metrics div {
+  color: rgba(255, 255, 255, 0.78);
+}
+
 .hero-metrics strong {
   font-size: 1.5rem;
   letter-spacing: -0.04em;
   color: #1d2b20;
 }
 
+.app-shell.dark .hero-metrics strong {
+  color: #ffffff;
+}
+
 .hero-visual-card {
   position: relative;
   min-height: 30rem;
   border-radius: 2rem;
-  background: linear-gradient(160deg, #edf5e8 0%, #f8f0e1 100%);
-  box-shadow: 0 24px 60px rgba(22, 51, 34, 0.08);
   overflow: hidden;
+}
+
+.app-shell.dark .hero-visual-card {
+  background: linear-gradient(160deg, #1b1d22 0%, #111315 100%);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
+}
+
+.app-shell.light .hero-visual-card {
+  background: linear-gradient(160deg, #dfeeff 0%, #f0f7ff 100%);
+  box-shadow: 0 24px 60px rgba(28, 85, 210, 0.12);
 }
 
 .hero-image-large {
@@ -136,6 +249,13 @@ body {
   box-shadow: 0 18px 32px rgba(17, 17, 17, 0.12);
   padding: 1rem 1.1rem;
   backdrop-filter: blur(10px);
+}
+
+.app-shell.dark .floating-card {
+  background: rgba(16, 19, 24, 0.9);
+  border-color: rgba(255, 255, 255, 0.09);
+  color: #f5f7fb;
+  box-shadow: 0 18px 32px rgba(0, 0, 0, 0.28);
 }
 
 .card-one {
@@ -164,7 +284,7 @@ body {
 .category-tile:hover,
 .product-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 18px 40px rgba(17, 17, 17, 0.08) !important;
+  box-shadow: 0 18px 40px rgba(17, 17, 17, 0.16) !important;
 }
 
 .category-icon {
@@ -174,23 +294,82 @@ body {
 }
 
 .filter-pill {
-  border: 1px solid rgba(17, 17, 17, 0.1);
   background: transparent;
   padding: 0.7rem 1.1rem;
   border-radius: 999px;
   font-weight: 600;
-  color: #3a3a3a;
 }
 
-.filter-pill.active {
-  background: #1e5f3d;
+.app-shell.dark .text-muted,
+.app-shell.dark .text-secondary,
+.app-shell.dark .small,
+.app-shell.dark .form-label,
+.app-shell.dark .card-text,
+.app-shell.dark .text-black-50,
+.app-shell.dark .badge,
+.app-shell.dark .btn-outline-light,
+.app-shell.dark .btn-link {
+  color: rgba(240, 245, 255, 0.8) !important;
+}
+
+.app-shell.dark .text-white-50 {
+  color: rgba(255, 255, 255, 0.72) !important;
+}
+
+.app-shell.dark p,
+.app-shell.dark li,
+.app-shell.dark span,
+.app-shell.dark label,
+.app-shell.dark strong,
+.app-shell.dark div,
+.app-shell.dark td,
+.app-shell.dark th {
+  color: inherit;
+}
+
+.app-shell.dark .filter-pill {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.app-shell.dark .filter-pill.active {
+  background: #f4f4f4;
+  color: #121315;
+  border-color: #f4f4f4;
+}
+
+.app-shell.light .filter-pill {
+  border: 1px solid rgba(13, 94, 247, 0.15);
+  color: #1d4ed8;
+}
+
+.app-shell.light .filter-pill.active {
+  background: #0d5ef7;
   color: #fff;
-  border-color: #1e5f3d;
+  border-color: #0d5ef7;
 }
 
 .product-card {
   border-radius: 1.5rem;
   transition: all 0.25s ease;
+}
+
+.app-shell.dark .product-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+.app-shell.dark .product-card .card-body {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.app-shell.light .product-card {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(85, 126, 255, 0.12) !important;
+}
+
+.app-shell.light .product-card .card-body {
+  background: rgba(248, 251, 255, 0.95);
 }
 
 .product-image {
@@ -200,13 +379,27 @@ body {
 
 .product-title {
   letter-spacing: -0.03em;
-  color: #1b1b1b;
+}
+
+.app-shell.dark .product-title {
+  color: #f2f2f2;
+}
+
+.app-shell.light .product-title {
+  color: #0f172a;
 }
 
 .price-main {
   font-weight: 800;
   font-size: 1.35rem;
-  color: #171717;
+}
+
+.app-shell.dark .price-main {
+  color: #ffffff;
+}
+
+.app-shell.light .price-main {
+  color: #1147c8;
 }
 
 .cart-item,
@@ -219,6 +412,30 @@ body {
   border-radius: 1.5rem !important;
 }
 
+.app-shell.dark .cart-item {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  color: #f3f6fb;
+}
+
+.app-shell.dark .cart-item .fw-semibold,
+.app-shell.dark .cart-item .text-muted,
+.app-shell.dark .cart-item .text-end,
+.app-shell.dark .summary-card h4,
+.app-shell.dark .summary-card .d-flex,
+.app-shell.dark .summary-card .fw-bold,
+.app-shell.dark .summary-card span,
+.app-shell.dark .summary-card div {
+  color: #f4f7fb !important;
+}
+
+.app-shell.dark .summary-card .text-muted,
+.app-shell.dark .summary-card .text-muted span,
+.app-shell.dark .cart-item .text-muted,
+.app-shell.dark .cart-item .small {
+  color: rgba(236, 241, 250, 0.74) !important;
+}
+
 .cart-thumb {
   width: 110px;
   height: 84px;
@@ -226,15 +443,123 @@ body {
   object-fit: cover;
 }
 
-.summary-card {
-  background: #fff;
-  border: 1px solid rgba(23, 23, 23, 0.06);
+.app-shell.dark .summary-card,
+.app-shell.dark .checkout-card,
+.app-shell.dark .success-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #f3f6fb;
 }
 
-.checkout-card,
-.success-card {
-  background: #fff;
-  border: 1px solid rgba(23, 23, 23, 0.06);
+.app-shell.dark .summary-card .btn,
+.app-shell.dark .cart-item .btn,
+.app-shell.dark .cart-item .btn-link {
+  color: #f3f6fb;
+}
+
+.app-shell.dark .cart-item .btn-light,
+.app-shell.dark .cart-item .btn-outline-light {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: white;
+}
+
+.app-shell.dark .card {
+  background: rgba(17, 22, 29, 0.96) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #f4f7fb !important;
+}
+
+.app-shell.dark .card-body,
+.app-shell.dark .card-header,
+.app-shell.dark .card-footer {
+  background: transparent !important;
+  color: #f4f7fb !important;
+}
+
+.app-shell.dark .form-control,
+.app-shell.dark .form-select,
+.app-shell.dark .form-select option,
+.app-shell.dark .input-group-text {
+  background: rgba(13, 18, 24, 0.96) !important;
+  border-color: rgba(255, 255, 255, 0.11) !important;
+  color: #f4f7fb !important;
+}
+
+.app-shell.dark .form-control::placeholder,
+.app-shell.dark .form-select::placeholder {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+.app-shell.dark .table {
+  --bs-table-bg: rgba(15, 20, 27, 0.8) !important;
+  --bs-table-color: #f3f7ff !important;
+  --bs-table-border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #f3f7ff !important;
+}
+
+.app-shell.dark .table-light {
+  background: rgba(10, 14, 20, 0.98) !important;
+  color: #f3f7ff !important;
+}
+
+.app-shell.dark .table thead th {
+  background: rgba(12, 17, 24, 1) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #f3f7ff !important;
+}
+
+.app-shell.dark .table tbody td {
+  background: rgba(17, 22, 29, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #f3f7ff !important;
+}
+
+.app-shell.dark .table-active {
+  background: rgba(70, 122, 255, 0.18) !important;
+}
+
+.app-shell.dark .btn-outline-dark {
+  color: #f4f7fb !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.app-shell.dark .btn-outline-dark:hover,
+.app-shell.dark .btn-outline-dark:focus {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.app-shell.dark .bg-light,
+.app-shell.dark .bg-light-subtle,
+.app-shell.dark .bg-white {
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: #f4f7fb !important;
+}
+
+.app-shell.dark .border {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.app-shell.dark .text-muted,
+.app-shell.dark .small.text-muted,
+.app-shell.dark .small,
+.app-shell.dark .badge,
+.app-shell.dark .label {
+  color: rgba(233, 239, 250, 0.76) !important;
+}
+
+.app-shell.dark .alert-success {
+  background: rgba(31, 95, 67, 0.28);
+  border-color: rgba(92, 196, 134, 0.3);
+  color: #e8fff2;
+}
+
+.app-shell.light .summary-card,
+.app-shell.light .checkout-card,
+.app-shell.light .success-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(55, 95, 255, 0.12);
 }
 
 .checkout-item + .checkout-item {
@@ -264,7 +589,7 @@ body {
 .confirm-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(17, 17, 17, 0.35);
+  background: rgba(17, 17, 17, 0.42);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -273,21 +598,51 @@ body {
 }
 
 .confirm-modal-card {
-  width: min(100%, 420px);
+  width: min(100%, 480px);
   border: 1px solid rgba(23, 23, 23, 0.08);
+  background: #fff;
+  border-radius: 1.75rem !important;
+  overflow: hidden;
+}
+
+.confirm-modal-card .card-body {
+  padding: 1.5rem;
 }
 
 .confirm-modal-icon {
   width: 4rem;
   height: 4rem;
   margin: 0 auto;
-  border-radius: 50%;
+  border-radius: 1.15rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fff3db;
-  color: #c77a00;
+  background: linear-gradient(135deg, #f7eddf, #f2e6d5);
+  color: #a96f33;
   font-size: 1.8rem;
+}
+
+.confirm-modal-title {
+  color: #1a1a1a;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.confirm-modal-meta {
+  background: #f8f7f5;
+  border: 1px solid rgba(17, 17, 17, 0.05);
+  border-radius: 1rem;
+  padding: 0.9rem 1rem;
+}
+
+.confirm-modal-meta .label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #8b7d6f;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+  margin-bottom: 0.35rem;
 }
 
 .auth-card {

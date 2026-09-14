@@ -1,8 +1,10 @@
 import { Navbar, Nav, Button, Badge } from 'react-bootstrap';
 
-function Topbar({ cartCount, currentUser, onLogout }) {
+function Topbar({ cartCount, currentUser, onLogout, theme, onToggleTheme }) {
+  const isDark = theme === 'dark';
+
   return (
-    <Navbar bg="white" expand="lg" className="border-bottom sticky-top shadow-sm topbar-shell">
+    <Navbar expand="lg" className="border-bottom sticky-top shadow-sm topbar-shell">
       <div className="container py-2">
         <Navbar.Brand href="#/" className="fw-bold brand-text d-flex align-items-center gap-2">
           <span className="brand-mark d-flex align-items-center justify-content-center">
@@ -23,9 +25,19 @@ function Topbar({ cartCount, currentUser, onLogout }) {
           </Nav>
 
           <div className="d-flex align-items-center gap-3 ms-auto flex-wrap justify-content-end">
-            <Button href="#/cart" variant="outline-dark" size="sm" className="rounded-pill px-3 position-relative">
+            <Button
+              variant={isDark ? 'outline-light' : 'dark'}
+              size="sm"
+              className="rounded-pill px-3 theme-toggle-btn"
+              onClick={onToggleTheme}
+            >
+              <i className={`bi ${isDark ? 'bi-sun-fill' : 'bi-moon-fill'} me-2`} />
+              {isDark ? 'Light' : 'Dark'}
+            </Button>
+
+            <Button href="#/cart" variant={isDark ? 'outline-light' : 'outline-dark'} size="sm" className="rounded-pill px-3 position-relative">
               <i className="bi bi-cart3 me-2" />Cart
-              <Badge bg="dark" className="rounded-pill position-absolute top-0 start-100 translate-middle">
+              <Badge bg={isDark ? 'light' : 'dark'} text={isDark ? 'dark' : 'white'} className="rounded-pill position-absolute top-0 start-100 translate-middle">
                 {cartCount}
               </Badge>
             </Button>
@@ -37,12 +49,12 @@ function Topbar({ cartCount, currentUser, onLogout }) {
                   <div className="fw-semibold small mb-0">{currentUser.name}</div>
                   <small className="text-muted">{currentUser.role}</small>
                 </div>
-                <Button size="sm" variant="link" className="text-dark p-0 ms-1" onClick={onLogout}>
+                <Button size="sm" variant="link" className="p-0 ms-1 theme-link-btn" onClick={onLogout}>
                   Logout
                 </Button>
               </div>
             ) : (
-              <Button href="#/login" variant="dark" size="sm" className="rounded-pill px-3">
+              <Button href="#/login" variant={isDark ? 'light' : 'dark'} size="sm" className="rounded-pill px-3">
                 Login
               </Button>
             )}
