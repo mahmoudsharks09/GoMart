@@ -1,6 +1,6 @@
-import { Navbar, Nav, Form, InputGroup, Button, Badge } from 'react-bootstrap';
+import { Navbar, Nav, Button, Badge } from 'react-bootstrap';
 
-function Topbar({ cartCount, onSearch, searchQuery, setSearchQuery, currentUser, onLogout }) {
+function Topbar({ cartCount, currentUser, onLogout }) {
   return (
     <Navbar bg="white" expand="lg" className="border-bottom sticky-top shadow-sm topbar-shell">
       <div className="container py-2">
@@ -23,23 +23,6 @@ function Topbar({ cartCount, onSearch, searchQuery, setSearchQuery, currentUser,
           </Nav>
 
           <div className="d-flex align-items-center gap-3 ms-auto flex-wrap justify-content-end">
-            <InputGroup style={{ width: 260 }} className="search-box">
-              <InputGroup.Text className="bg-light border-end-0">
-                <i className="bi bi-search" />
-              </InputGroup.Text>
-              <Form.Control
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') {
-                    onSearch(searchQuery);
-                  }
-                }}
-                placeholder="Search products"
-                aria-label="Search products"
-              />
-            </InputGroup>
-
             <Button href="#/cart" variant="outline-dark" size="sm" className="rounded-pill px-3 position-relative">
               <i className="bi bi-cart3 me-2" />Cart
               <Badge bg="dark" className="rounded-pill position-absolute top-0 start-100 translate-middle">
