@@ -45,17 +45,6 @@ function ProductDetailPage({ products, onAddToCart }) {
           </div>
           <p className="text-muted mb-4">{product.description}</p>
 
-          <div className="mb-4">
-            <div className="fw-semibold mb-2">Color options</div>
-            <div className="d-flex gap-2 flex-wrap">
-              {product.colors.map((color) => (
-                <span key={color} className="color-chip">
-                  {color}
-                </span>
-              ))}
-            </div>
-          </div>
-
           <div className="d-flex gap-3 flex-wrap mb-4">
             <Button variant="dark" className="rounded-pill px-4" onClick={() => onAddToCart(product)}>
               Add to cart
