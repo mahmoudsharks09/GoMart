@@ -1,6 +1,8 @@
 .app-shell {
   width: 100%;
   min-height: 100dvh;
+  max-width: none;
+  overflow-x: hidden;
   transition: background 0.25s ease, color 0.25s ease;
 }
 
@@ -23,7 +25,8 @@ body {
   position: sticky;
   top: 0;
   z-index: 20;
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
 }
 
 .app-shell.dark .topbar-shell {
@@ -722,6 +725,26 @@ body {
 }
 
 @media (max-width: 767.98px) {
+  .app-shell {
+    min-height: 100dvh;
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+
+  .topbar-shell {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    backdrop-filter: blur(18px) saturate(170%);
+    -webkit-backdrop-filter: blur(18px) saturate(170%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .topbar-shell .container {
+    padding-top: max(0.55rem, env(safe-area-inset-top));
+    padding-bottom: 0.55rem;
+    max-width: 100%;
+  }
+
   .hero-section {
     padding-top: 1.25rem;
   }
@@ -748,6 +771,8 @@ body {
   .floating-card {
     padding: 0.8rem 0.9rem;
     border-radius: 1rem;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
   .card-one {
@@ -795,8 +820,8 @@ body {
 
 @media (max-width: 575.98px) {
   .topbar-shell {
-    padding-top: 0.25rem;
-    padding-bottom: 0.25rem;
+    padding-top: 0.15rem;
+    padding-bottom: 0.15rem;
   }
 
   .navbar-brand {
@@ -813,39 +838,37 @@ body {
   }
 
   .nav-links {
-    flex-direction: column;
-    align-items: flex-start;
-    width: 100%;
-    margin-bottom: 0.35rem;
+    display: none;
   }
 
   .navbar-collapse .d-flex.align-items-center.gap-3 {
     width: 100%;
     justify-content: stretch;
-    flex-direction: column;
-    align-items: stretch !important;
+    flex-direction: row;
+    align-items: center !important;
+    flex-wrap: wrap;
   }
 
   .theme-toggle-btn,
   .navbar-collapse .btn,
   .user-chip {
-    width: 100%;
+    width: auto;
     justify-content: center;
   }
 
   .user-chip {
     display: flex;
-    flex-direction: column;
-    padding: 0.8rem 0.9rem;
-    text-align: center;
+    flex-direction: row;
+    padding: 0.6rem 0.75rem;
+    text-align: left;
   }
 
   .user-chip > div {
-    width: 100%;
+    width: auto;
   }
 
   .avatar-circle {
-    margin: 0 auto 0.35rem;
+    margin: 0;
   }
 
   .detail-gallery-main img {
@@ -855,5 +878,24 @@ body {
   .detail-thumb {
     width: 30%;
     height: 5.5rem;
+  }
+}
+
+@media (orientation: landscape) and (max-width: 920px) {
+  .app-shell {
+    min-height: 100dvh;
+  }
+
+  .hero-section {
+    padding-top: 0.75rem;
+  }
+
+  .hero-visual-card {
+    min-height: 15rem;
+  }
+
+  .topbar-shell .container {
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
   }
 }
