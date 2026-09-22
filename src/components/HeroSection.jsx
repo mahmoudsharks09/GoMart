@@ -11,7 +11,7 @@ function HeroSection() {
               Everything You Need. One Place.
             </h1>
             <p className="lead text-muted mb-4">
-              Shop a curated mix of tech, beauty, fashion, home must-haves, and daily essentials that fit real life.
+              Discover everyday essentials, trending favorites, and smart lifestyle picks in one modern shop.
             </p>
             <div className="d-flex gap-3 flex-wrap">
               <Button href="#/products" variant="dark" className="rounded-pill px-4 py-2">

@@ -495,27 +495,16 @@ function StorefrontApp() {
     }
   };
 
-  const handleCreateCart = async () => {
-    try {
-      const sampleProduct = products[0];
-      const response = await fetch('https://dummyjson.com/carts/add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: 1,
-          products: sampleProduct ? [{ id: sampleProduct.id, quantity: 1 }] : [],
-        }),
-      });
+  const handleCreateOrder = (order) => {
+    setCarts((prev) => [order, ...prev]);
+  };
 
-      if (!response.ok) {
-        throw new Error('Unable to add cart.');
-      }
+  const handleUpdateOrder = (orderId, order) => {
+    setCarts((prev) => prev.map((item) => (String(item.id) === String(orderId) ? { ...item, ...order, id: item.id } : item)));
+  };
 
-      const createdCart = await response.json();
-      setCarts((prev) => [createdCart, ...prev]);
-    } catch (fetchError) {
-      setError(fetchError.message || 'Unable to add cart.');
-    }
+  const handleDeleteOrder = (orderId) => {
+    setCarts((prev) => prev.filter((item) => String(item.id) !== String(orderId)));
   };
 
   return (
@@ -616,7 +605,9 @@ function StorefrontApp() {
                 onAddProduct={handleAddProduct}
                 onUpdateProduct={handleUpdateProduct}
                 onDeleteProduct={handleDeleteProduct}
-                onCreateCart={handleCreateCart}
+                onCreateOrder={handleCreateOrder}
+                onUpdateOrder={handleUpdateOrder}
+                onDeleteOrder={handleDeleteOrder}
               />
             ) : (
               <Navigate to="/login" replace />

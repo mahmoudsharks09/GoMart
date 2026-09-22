@@ -22,6 +22,12 @@ const defaultUserForm = {
   image: '',
 };
 
+const defaultOrderForm = {
+  userId: '1',
+  items: [{ productId: '', quantity: '1' }],
+  status: 'Pending',
+};
+
 const productImageMap = {
   'Tech Essentials': 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80',
   'Fashion Edit': 'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=900&q=80',
@@ -65,7 +71,9 @@ function DashboardPage({
   onAddProduct,
   onUpdateProduct,
   onDeleteProduct,
-  onCreateCart,
+  onCreateOrder,
+  onUpdateOrder,
+  onDeleteOrder,
 }) {
   const [form, setForm] = useState(defaultProductForm);
   const [editingId, setEditingId] = useState(null);
@@ -78,6 +86,8 @@ function DashboardPage({
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [userForm, setUserForm] = useState(defaultUserForm);
   const [editingUserId, setEditingUserId] = useState(null);
+  const [orderForm, setOrderForm] = useState(defaultOrderForm);
+  const [editingOrderId, setEditingOrderId] = useState(null);
   const [confirmState, setConfirmState] = useState(null);
 
   const dashboardUsers = useMemo(() => {
@@ -168,15 +178,128 @@ function DashboardPage({
   const summary = useMemo(() => {
     const productCount = products.length;
     const userCount = dashboardUsers.length;
-    const cartCount = 0;
-    const revenue = 0;
+    const orderCount = carts.length;
+    const revenue = carts.reduce((sum, order) => sum + Number(order.total || 0), 0);
 
-    return { productCount, userCount, cartCount, revenue };
-  }, [products, dashboardUsers]);
+    return { productCount, userCount, orderCount, revenue };
+  }, [products, dashboardUsers, carts]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleOrderFormChange = (event) => {
+    const { name, value } = event.target;
+    setOrderForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleOrderItemChange = (index, field, value) => {
+    setOrderForm((prev) => ({
+      ...prev,
+      items: prev.items.map((item, itemIndex) => (itemIndex === index ? { ...item, [field]: value } : item)),
+    }));
+  };
+
+  const addOrderItem = () => {
+    setOrderForm((prev) => ({ ...prev, items: [...prev.items, { productId: '', quantity: '1' }] }));
+  };
+
+  const removeOrderItem = (index) => {
+    setOrderForm((prev) => ({ ...prev, items: prev.items.filter((_, itemIndex) => itemIndex !== index) }));
+  };
+
+  const resetOrderForm = () => {
+    setOrderForm(defaultOrderForm);
+    setEditingOrderId(null);
+  };
+
+  const handleOrderSubmit = (event) => {
+    event.preventDefault();
+
+    const orderItems = orderForm.items
+      .map((item) => ({
+        product: products.find((productItem) => String(productItem.id) === String(item.productId)),
+        quantity: Math.max(1, Number(item.quantity || 1)),
+      }))
+      .filter((item) => item.product);
+
+    if (orderItems.length !== orderForm.items.length || orderItems.length === 0) {
+      triggerAlert('Please select a product for every order item.');
+      return;
+    }
+
+    const orderProducts = orderItems.map(({ product, quantity }) => ({
+      id: product.id,
+      title: product.name,
+      price: product.price,
+      quantity,
+      total: product.price * quantity,
+    }));
+    const totalQuantity = orderProducts.reduce((sum, item) => sum + item.quantity, 0);
+    const total = orderProducts.reduce((sum, item) => sum + item.total, 0);
+
+    const order = {
+      id: editingOrderId || `new-${Date.now()}`,
+      userId: Number(orderForm.userId) || orderForm.userId || 1,
+      products: orderProducts,
+      total,
+      totalQuantity,
+      totalProducts: orderProducts.length,
+      status: orderForm.status,
+    };
+
+    const isEditing = Boolean(editingOrderId);
+    openConfirmDialog(
+      `${isEditing ? 'Save changes to' : 'Create'} this order?`,
+      () => {
+        if (isEditing) {
+          onUpdateOrder(editingOrderId, order);
+          triggerAlert('Order updated successfully.');
+        } else {
+          onCreateOrder(order);
+          triggerAlert('Order created successfully.');
+        }
+        resetOrderForm();
+        setConfirmState(null);
+      },
+      {
+        type: 'order',
+        action: isEditing ? 'Update order' : 'Create order',
+        title: isEditing ? `Order #${editingOrderId}` : 'New order',
+        details: [
+          { label: 'User ID', value: String(order.userId) },
+          { label: 'Products', value: `${orderProducts.length} product${orderProducts.length === 1 ? '' : 's'}` },
+          { label: 'Items', value: String(totalQuantity) },
+          { label: 'Total', value: `$${total.toFixed(2)}` },
+          { label: 'Status', value: order.status },
+        ],
+      },
+    );
+  };
+
+  const handleEditOrder = (order) => {
+    setEditingOrderId(order.id);
+    setOrderForm({
+      userId: String(order.userId || '1'),
+      items: order.products?.length
+        ? order.products.map((item) => ({ productId: String(item.id), quantity: String(item.quantity || 1) }))
+        : [{ productId: '', quantity: '1' }],
+      status: order.status || 'Pending',
+    });
+  };
+
+  const handleDeleteOrder = (orderId) => {
+    openConfirmDialog(`Are you sure you want to delete Order #${orderId}?`, () => {
+      onDeleteOrder(orderId);
+      triggerAlert('Order deleted successfully.');
+      setConfirmState(null);
+    }, {
+      type: 'order',
+      action: 'Delete order',
+      title: `Order #${orderId}`,
+      details: [{ label: 'Order total', value: `$${Number(carts.find((item) => item.id === orderId)?.total || 0).toFixed(2)}` }],
+    });
   };
 
   const handleUserFormChange = (event) => {
@@ -438,7 +561,7 @@ function DashboardPage({
       </Card>
 
       <div className="d-flex flex-wrap gap-2 mb-4">
-        {['products', 'carts', 'users', 'authentication'].map((tab) => (
+        {['products', 'orders', 'users', 'authentication'].map((tab) => (
           <Button
             key={tab}
             variant={activeTab === tab ? 'dark' : 'outline-dark'}
@@ -465,8 +588,8 @@ function DashboardPage({
         </Col>
         <Col md={4}>
           <Card className="summary-card border-0 shadow-sm p-3 h-100">
-            <div className="text-muted small">Carts</div>
-            <div className="display-6 fw-bold mt-2">{carts.length}</div>
+            <div className="text-muted small">Orders</div>
+            <div className="display-6 fw-bold mt-2">{summary.orderCount}</div>
           </Card>
         </Col>
       </Row>
@@ -621,15 +744,77 @@ function DashboardPage({
         </Row>
       ) : null}
 
-      {activeTab === 'carts' ? (
+      {activeTab === 'orders' ? (
         <Card className="border-0 shadow-sm p-3">
-          <h4 className="mb-3">Carts</h4>
+          <h4 className="mb-3">Orders</h4>
+          <Row className="g-4">
+            <Col lg={4}>
+              <Card className="border-0 bg-body-tertiary p-3 h-100">
+                <h5 className="mb-3">{editingOrderId ? 'Edit order' : 'Create order'}</h5>
+                <Form onSubmit={handleOrderSubmit}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>User ID</Form.Label>
+                    <Form.Control name="userId" value={orderForm.userId} onChange={handleOrderFormChange} required />
+                  </Form.Group>
+                  <div className="d-flex justify-content-between align-items-center mb-2">
+                    <Form.Label className="mb-0">Products</Form.Label>
+                    <Button type="button" size="sm" variant="outline-dark" className="rounded-pill" onClick={addOrderItem}>
+                      <i className="bi bi-plus-lg me-1" />Add product
+                    </Button>
+                  </div>
+                  <div className="d-grid gap-2 mb-3">
+                    {orderForm.items.map((item, index) => (
+                      <div key={`order-item-${index}`} className="border rounded-3 p-2">
+                        <div className="d-flex gap-2 align-items-center">
+                          <Form.Select value={item.productId} onChange={(event) => handleOrderItemChange(index, 'productId', event.target.value)} required>
+                            <option value="">Select a product</option>
+                            {products.map((product) => <option key={product.id} value={product.id}>{product.name}</option>)}
+                          </Form.Select>
+                          <Form.Control
+                            type="number"
+                            min="1"
+                            value={item.quantity}
+                            onChange={(event) => handleOrderItemChange(index, 'quantity', event.target.value)}
+                            aria-label={`Quantity for product ${index + 1}`}
+                            style={{ maxWidth: 78 }}
+                            required
+                          />
+                          {orderForm.items.length > 1 ? (
+                            <Button type="button" variant="link" className="text-danger p-1" onClick={() => removeOrderItem(index)} aria-label="Remove product">
+                              <i className="bi bi-trash" />
+                            </Button>
+                          ) : null}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Status</Form.Label>
+                    <Form.Select name="status" value={orderForm.status} onChange={handleOrderFormChange}>
+                      <option>Pending</option>
+                      <option>Processing</option>
+                      <option>Shipped</option>
+                      <option>Delivered</option>
+                      <option>Cancelled</option>
+                    </Form.Select>
+                  </Form.Group>
+                  <div className="d-flex gap-2 flex-wrap">
+                    <Button type="submit" variant="dark" className="rounded-pill px-4">{editingOrderId ? 'Save changes' : 'Create order'}</Button>
+                    {editingOrderId ? <Button type="button" variant="outline-dark" className="rounded-pill px-4" onClick={resetOrderForm}>Cancel</Button> : null}
+                  </div>
+                </Form>
+              </Card>
+            </Col>
+            <Col lg={8}>
           <div className="d-grid gap-3">
             {(carts || []).map((cartItem) => (
               <div key={cartItem.id} className="border rounded-4 p-3">
                 <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
-                  <div className="fw-semibold">Cart #{cartItem.id}</div>
-                  <span className="badge rounded-pill bg-light text-dark">{cartItem.products?.length || 0} items</span>
+                  <div className="fw-semibold">Order #{cartItem.id}</div>
+                  <div className="d-flex align-items-center gap-2">
+                    <span className="badge rounded-pill bg-light text-dark">{cartItem.status || 'Pending'}</span>
+                    <span className="badge rounded-pill bg-light text-dark">{cartItem.products?.length || 0} items</span>
+                  </div>
                 </div>
                 <div className="small text-muted mb-2">User ID: {cartItem.userId}</div>
                 <div className="d-flex flex-wrap gap-2">
@@ -639,9 +824,18 @@ function DashboardPage({
                     </span>
                   ))}
                 </div>
+                <div className="d-flex justify-content-between align-items-center mt-3">
+                  <strong>${Number(cartItem.total || 0).toFixed(2)}</strong>
+                  <div className="d-flex gap-2">
+                    <Button size="sm" variant="outline-dark" onClick={() => handleEditOrder(cartItem)}>Edit</Button>
+                    <Button size="sm" variant="outline-danger" onClick={() => handleDeleteOrder(cartItem.id)}>Delete</Button>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
+            </Col>
+          </Row>
         </Card>
       ) : null}
 
