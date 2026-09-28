@@ -98,6 +98,7 @@ const mapDummyProduct = (product) => {
     image: product.thumbnail || product.images?.[0],
     gallery: product.images?.length ? product.images : [product.thumbnail || product.images?.[0]],
     description: product.description,
+    dateAdded: product.meta?.createdAt || product.createdAt || null,
     features: [
       `${product.brand || 'Premium'} quality`,
       `In stock: ${product.stock || 0}`,
