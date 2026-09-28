@@ -86,6 +86,57 @@ function HomePage({
           ))}
         </div>
       </Container>
+
+      <footer className="site-footer">
+        <Container>
+          <Row className="g-4 justify-content-between">
+            <Col md={5} lg={4}>
+              <Link to="/" className="footer-brand text-decoration-none">
+                <span className="brand-mark d-inline-flex align-items-center justify-content-center">
+                  <i className="bi bi-shop" aria-hidden="true" />
+                </span>
+                <span>GoMart</span>
+              </Link>
+              <p className="footer-copy mt-3">
+                Thoughtful finds, everyday essentials, and easy shopping for the way you live.
+              </p>
+            </Col>
+
+            <Col xs={6} md={3} lg={2}>
+              <h2 className="footer-heading">Shop</h2>
+              <div className="footer-links">
+                <Link to="/products">All products</Link>
+                <Link to="/categories">Categories</Link>
+                <Link to="/cart">Your cart</Link>
+              </div>
+            </Col>
+
+            <Col xs={6} md={3} lg={2}>
+              <h2 className="footer-heading">Account</h2>
+              <div className="footer-links">
+                <Link to="/login">Sign in</Link>
+                <Link to="/checkout">Checkout</Link>
+                <a href="mailto:hello@gomart.example">Contact us</a>
+              </div>
+            </Col>
+          </Row>
+
+          <div className="footer-bottom mt-5 pt-4">
+            <span>© {new Date().getFullYear()} GoMart. All rights reserved.</span>
+            <div className="footer-socials" aria-label="Social media links">
+              <a href="https://instagram.com" aria-label="Instagram">
+                <i className="bi bi-instagram" aria-hidden="true" />
+              </a>
+              <a href="https://facebook.com" aria-label="Facebook">
+                <i className="bi bi-facebook" aria-hidden="true" />
+              </a>
+              <a href="mailto:hello@gomart.example" aria-label="Email GoMart">
+                <i className="bi bi-envelope" aria-hidden="true" />
+              </a>
+            </div>
+          </div>
+        </Container>
+      </footer>
     </>
   );
 }

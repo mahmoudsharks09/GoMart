@@ -519,6 +519,123 @@ body {
   background: rgba(70, 122, 255, 0.18) !important;
 }
 
+.site-footer {
+  margin-top: 2rem;
+  padding: 4rem 0 1.5rem;
+  border-top: 1px solid rgba(15, 23, 42, 0.1);
+  background: #eaf2fb;
+}
+
+.app-shell.dark .site-footer {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: #171a1f;
+}
+
+.footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: #0f172a;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.footer-brand .brand-mark {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.65rem;
+  font-size: 0.9rem;
+}
+
+.app-shell.dark .footer-brand {
+  color: #f3f3f3;
+}
+
+.footer-copy {
+  max-width: 23rem;
+  color: #526174;
+}
+
+.app-shell.dark .footer-copy {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.footer-heading {
+  margin-bottom: 1rem;
+  color: #0f172a;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.app-shell.dark .footer-heading {
+  color: #f3f3f3;
+}
+
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.footer-links a,
+.footer-socials a {
+  color: #526174;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover,
+.footer-links a:focus,
+.footer-socials a:hover,
+.footer-socials a:focus {
+  color: #0d5ef7;
+}
+
+.app-shell.dark .footer-links a,
+.app-shell.dark .footer-socials a {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.app-shell.dark .footer-links a:hover,
+.app-shell.dark .footer-links a:focus,
+.app-shell.dark .footer-socials a:hover,
+.app-shell.dark .footer-socials a:focus {
+  color: #ffffff;
+}
+
+.footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid rgba(15, 23, 42, 0.1);
+  color: #69788b;
+  font-size: 0.85rem;
+}
+
+.app-shell.dark .footer-bottom {
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.footer-socials {
+  display: flex;
+  gap: 1rem;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 575.98px) {
+  .site-footer {
+    padding-top: 3rem;
+  }
+
+  .footer-bottom {
+    align-items: flex-start;
+    flex-direction: column-reverse;
+  }
+}
+
 .app-shell.dark .btn-outline-dark {
   color: #f4f7fb !important;
   border-color: rgba(255, 255, 255, 0.3) !important;
