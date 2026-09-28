@@ -41,6 +41,26 @@ function AuthPage({ authMode, setAuthMode, onSubmit, authError }) {
               </Button>
             </Form>
 
+            {authMode === 'login' ? (
+              <>
+                <div className="auth-divider" aria-hidden="true">or</div>
+                <Row className="g-2">
+                  <Col>
+                    <Button variant="outline-secondary" type="button" className="social-auth-button w-100">
+                      <i className="bi bi-apple" aria-hidden="true" />
+                      <span>Apple</span>
+                    </Button>
+                  </Col>
+                  <Col>
+                    <Button variant="outline-secondary" type="button" className="social-auth-button w-100">
+                      <i className="bi bi-google" aria-hidden="true" />
+                      <span>Google</span>
+                    </Button>
+                  </Col>
+                </Row>
+              </>
+            ) : null}
+
             <div className="text-center mt-3 text-muted small">
               {authMode === 'login' ? 'Need an account?' : 'Already have an account?'}
               <button

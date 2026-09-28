@@ -766,6 +766,46 @@ body {
   padding: 2rem;
 }
 
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  color: #777;
+  font-size: 0.8rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(127, 127, 127, 0.25);
+}
+
+.social-auth-button {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.social-auth-button i {
+  font-size: 1.05rem;
+}
+
+.app-shell.dark .social-auth-button {
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #fff;
+}
+
+.app-shell.dark .social-auth-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
 .brand-mark {
   font-size: 1.2rem;
 }
